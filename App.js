@@ -1,20 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import "react-native-gesture-handler";
+
+import Navigation from "./src/navigation";
+import "./src/utils/localization/i18n";
+import { WebSocketProvider } from "./src/services/WebSocketContext";
+import { I18nManager } from "react-native";
+
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <WebSocketProvider>
+      <Navigation />
+    </WebSocketProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
