@@ -1,17 +1,20 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
 
 export const WebSocketContext = createContext();
 
 export const WebSocketProvider = ({ children }) => {
-  const [messages, setMessages] = useState([]);
-
+  const [message, setMessage] = useState();
+  const { user } = useContext(AuthContext);
   useEffect(() => {
-    connectWebsocket();
-  }, []);
+    if (user) {
+      connectWebsocket();
+    }
+  }, [user]);
 
   const connectWebsocket = () => {
     const ws = new WebSocket(
-      "ws://socket.live-menu.ir?ogid=34096430-A51E-4C78-92E5D9D08CADE8CD"
+      `ws://socket.live-menu.ir?ogid=${user?.gId}`
     );
 
     ws.onopen = () => {
@@ -20,7 +23,7 @@ export const WebSocketProvider = ({ children }) => {
 
     ws.onmessage = (event) => {
       const message = event.data;
-      setMessages((prevMessages) => [...prevMessages, message]);
+      setMessage(message);
       console.log("Received message:", message);
     };
 
@@ -28,7 +31,7 @@ export const WebSocketProvider = ({ children }) => {
       console.log("WebSocket connection closed");
       setTimeout(() => {
         connectWebsocket();
-      }, 5000);
+      }, 2000);
     };
 
     return () => {
@@ -37,7 +40,7 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const deleteMessage = (index) => {
-    setMessages((prevMessages) => {
+    setMessage((prevMessages) => {
       const updatedMessages = [...prevMessages];
       updatedMessages.splice(index, 1);
       return updatedMessages;
@@ -45,7 +48,7 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   return (
-    <WebSocketContext.Provider value={{ messages, deleteMessage }}>
+    <WebSocketContext.Provider value={{ message, deleteMessage }}>
       {children}
     </WebSocketContext.Provider>
   );
